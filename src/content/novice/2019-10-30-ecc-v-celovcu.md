@@ -18,7 +18,7 @@ gallery:
 title_en: "European Cadet Circuit in Klagenfurt"
 excerpt_en: "On Saturday, 26 October 2019, a European Cadet Circuit competition took place in Klagenfurt. Eva Figelj competed among the cadet women."
 body_en: |
-  On Saturday, 26 October 2019, a [European Cadet Circuit competition took place in Klagenfurt](https://www.eurofencing.info/competitions/latest-results/case:competitions/tournamentId:666).  
+  On Saturday, 26 October 2019, a European Cadet Circuit competition took place in Klagenfurt.  
   Eva Figelj competed among the cadet women. Unfortunately she didn't win a bout in her pool and finished 177th.
 
   Among the boys, as many as 5 of our fencers competed in a field of 213 épée fencers!  
@@ -31,7 +31,7 @@ body_en: |
 draft: false
 ---
 
-V soboto 26.10.2019 je v [Celovcu potekala tekma v evropskem kadetskem pokalu](https://www.eurofencing.info/competitions/latest-results/case:competitions/tournamentId:666).  
+V soboto 26.10.2019 je v Celovcu potekala tekma v evropskem kadetskem pokalu.  
 V kategoriji kadetinje je nastopila Eva Figelj. Žal v skupini ni dosegle zmage. Tekmo zaključila na 177. mestu.
 
 Med fanti je v konkurenci 213 mečistov nastopilo kar 5 naših fantov!  

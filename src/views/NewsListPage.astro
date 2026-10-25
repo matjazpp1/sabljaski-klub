@@ -24,7 +24,7 @@ const title = page > 1 ? `${t('nav.news')} – ${t('news.page')} ${page}` : t('n
       items.length ? (
         <div class="news-grid">
           {items.map((entry) => (
-            <NewsCard entry={entry} lang={lang} />
+            <NewsCard entry={entry} lang={lang} level={2} />
           ))}
         </div>
       ) : (

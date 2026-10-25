@@ -33,7 +33,7 @@ body_en: |
 
   - [Slovenian Fencing Federation](http://www.sabljaska-zveza.si/)
   - [International Fencing Federation (FIE)](https://fie.org/)
-  - [European Fencing Confederation (EFC)](https://www.eurofencing.info/)
+  - [European Fencing Confederation (EFC)](https://fencing-efc.eu/)
   - [FencingTimeLive](https://www.fencingtimelive.com/) – live results of international competitions
   - [Engarde](https://www.engarde-service.com/) – competition results
 ---
@@ -67,6 +67,6 @@ Ne. Sabljanje je eden izmed bolj varnih športov. Meči (pa tudi sablje in flore
 
 - [Sabljaška zveza Slovenije](http://www.sabljaska-zveza.si/)
 - [Mednarodna sabljaška zveza (FIE)](https://fie.org/)
-- [Evropska sabljaška zveza (EFC)](https://www.eurofencing.info/)
+- [Evropska sabljaška zveza (EFC)](https://fencing-efc.eu/)
 - [FencingTimeLive](https://www.fencingtimelive.com/) – rezultati mednarodnih tekmovanj v živo
 - [Engarde](https://www.engarde-service.com/) – rezultati tekmovanj
