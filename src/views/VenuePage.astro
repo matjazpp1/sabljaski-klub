@@ -1,0 +1,27 @@
+---
+import { getEntry } from 'astro:content';
+import ContentPage from './ContentPage.astro';
+import Icon from '../components/Icon.astro';
+import { useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const k = (await getEntry('kontakt', 'kontakt'))!.data;
+---
+
+<ContentPage lang={lang} id="dvorana" crumbs={[{ label: t('nav.club') }]} image="pas-2.jpg">
+  <div slot="aside" class="side-card">
+    <h2><Icon name="pin" /> {t('venue.address')}</h2>
+    <p>
+      <strong>{lang === 'en' ? k.dvorana_en : k.dvorana}</strong><br />
+      {k.naslov}<br />
+      {k.posta}
+    </p>
+    <a class="btn" href={k.zemljevid} target="_blank" rel="noopener">
+      {t('venue.map')} <span class="visually-hidden">{t('nav.newTab')}</span>
+    </a>
+  </div>
+</ContentPage>

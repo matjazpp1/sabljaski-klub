@@ -1,0 +1,28 @@
+# Urnik treningov po skupinah. Dnevi: pon, tor, sre, cet, pet, sob, ned
+skupine:
+  - id: zacetniki
+    skupina: Začetniki
+    skupina_en: Beginners
+    termini:
+      - { dan: tor, od: "16:45", do: "18:00" }
+      - { dan: cet, od: "16:45", do: "18:00" }
+  - id: mlajsi-tekmovalci
+    skupina: Mlajši tekmovalci
+    skupina_en: Younger competitors
+    termini:
+      - { dan: pon, od: "17:00", do: "18:30" }
+      - { dan: tor, od: "18:00", do: "19:30" }
+      - { dan: sre, od: "17:00", do: "18:30" }
+      - { dan: cet, od: "18:00", do: "19:30" }
+  - id: starejsi-tekmovalci
+    skupina: Starejši tekmovalci
+    skupina_en: Older competitors
+    termini:
+      - { dan: pon, od: "18:30", do: "20:00" }
+      - { dan: sre, od: "18:30", do: "20:00" }
+  - id: odrasli
+    skupina: Odrasli (rekreacija)
+    skupina_en: Adults (recreational)
+    termini:
+      - { dan: pon, od: "18:30", do: "20:00" }
+      - { dan: sre, od: "18:30", do: "20:00" }

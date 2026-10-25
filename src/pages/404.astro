@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { useTranslations } from '../i18n';
+
+const sl = useTranslations('sl');
+const en = useTranslations('en');
+---
+
+<BaseLayout lang="sl" title={sl('notFound.title')}>
+  <div class="container section">
+    <p class="eyebrow">404</p>
+    <h1>{sl('notFound.title')}</h1>
+    <p class="lead">{sl('notFound.text')}</p>
+    <p><a class="btn" href="/">{sl('notFound.home')}</a></p>
+    <div lang="en" style="margin-top:3rem">
+      <h2>{en('notFound.title')}</h2>
+      <p class="lead">{en('notFound.text')}</p>
+      <p><a class="btn btn--ghost" href="/en/">{en('notFound.home')}</a></p>
+    </div>
+  </div>
+</BaseLayout>

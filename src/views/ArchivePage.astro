@@ -1,0 +1,207 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { getArchiveBySeason } from '../lib/arhiv';
+import { getArchivedNews, getCutoff, localize, slugOf } from '../lib/novice';
+import { formatDate, path, useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const en = lang === 'en';
+const seasons = await getArchiveBySeason();
+const cutoffYear = (await getCutoff()).getFullYear();
+const oldNews = await getArchivedNews();
+const byYear = new Map<number, typeof oldNews>();
+for (const n of oldNews) {
+  const y = n.data.date.getFullYear();
+  byYear.set(y, [...(byYear.get(y) ?? []), n]);
+}
+---
+
+<BaseLayout lang={lang} title={t('nav.archive')} description={t('archive.lead')}>
+  <PageHeader lang={lang} title={t('nav.archive')} lead={t('archive.lead')} image="pas-2.jpg" />
+  <div class="container section">
+    <nav class="toc" aria-label={t('nav.archive')}>
+      <a href="#galerije">{t('archive.galleries')}</a>
+      <a href="#novice">{t('archive.oldNews')} {cutoffYear}</a>
+    </nav>
+
+    <h2 id="galerije" class="archive-title">{t('archive.galleries')}</h2>
+    {
+      seasons.map(([season, items]) => (
+        <section class="season" aria-labelledby={`s-${season.replace('/', '-')}`}>
+          <h3 id={`s-${season.replace('/', '-')}`}>
+            {t('archive.season')} {season.replace('/', '/20')}
+          </h3>
+          <ul class="cards">
+            {items.map((e) => (
+              <li class="card reveal">
+                <div class="card__media">
+                  {e.data.cover ? (
+                    <Image src={e.data.cover} alt="" widths={[320, 480, 640]} sizes="(max-width: 600px) 100vw, 300px" />
+                  ) : (
+                    <div class="card__placeholder" aria-hidden="true">
+                      <img src="/icon.png" alt="" width="96" height="96" loading="lazy" />
+                    </div>
+                  )}
+                </div>
+                <div class="card__body">
+                  <span class="card__type">{t(e.data.vrsta === 'liga' ? 'archive.league' : 'archive.gallery')}</span>
+                  <h4>
+                    <a href={path(lang, 'archive', e.id)}>{(en && e.data.title_en) || e.data.title}</a>
+                  </h4>
+                  {e.data.slike?.length ? (
+                    <span class="card__count">
+                      {e.data.slike.length} {t('gallery.count')}
+                    </span>
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+
+    <h2 id="novice" class="archive-title">{t('archive.oldNews')} {cutoffYear}</h2>
+    {
+      [...byYear.entries()].map(([year, items]) => (
+        <section class="year" aria-labelledby={`y-${year}`}>
+          <h3 id={`y-${year}`}>{year}</h3>
+          <ul>
+            {items.map((n) => (
+              <li>
+                <time datetime={n.data.date.toISOString().slice(0, 10)}>{formatDate(n.data.date, lang)}</time>
+                <a href={path(lang, 'news', slugOf(n))}>{localize(n, lang).title}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 2rem;
+    margin-bottom: 3rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .archive-title {
+    margin-top: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .season,
+  .year {
+    margin: 2.5rem 0 3.5rem;
+  }
+  .season h3,
+  .year h3 {
+    color: var(--accent-light);
+    font-size: 1.3rem;
+    letter-spacing: 0.08em;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .card {
+    position: relative;
+    background: var(--surface);
+    border-bottom: 3px solid transparent;
+    transition:
+      border-color 0.25s,
+      transform 0.25s var(--ease);
+  }
+  .card:hover,
+  .card:focus-within {
+    border-color: var(--accent-light);
+    transform: translateY(-3px);
+  }
+  .card__media {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--accent-dark);
+  }
+  .card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .card__placeholder {
+    display: grid;
+    place-items: center;
+    height: 100%;
+  }
+  .card__placeholder img {
+    width: 34%;
+    height: auto;
+  }
+  .card__body {
+    padding: 1rem 1.25rem 1.25rem;
+  }
+  .card__type,
+  .card__count {
+    color: var(--muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .card h4 {
+    margin: 0.35rem 0 0.5rem;
+    font-size: 1.1rem;
+    line-height: 1.25;
+  }
+  .card h4 a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .card h4 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .year ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    columns: 2;
+    column-gap: 3rem;
+  }
+  .year li {
+    display: grid;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--line);
+    break-inside: avoid;
+  }
+  .year time {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .year a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .year a:hover {
+    color: var(--accent-light);
+  }
+  @media (max-width: 800px) {
+    .year ul {
+      columns: 1;
+    }
+  }
+</style>

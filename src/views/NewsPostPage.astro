@@ -1,0 +1,106 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Gallery from '../components/Gallery.astro';
+import Icon from '../components/Icon.astro';
+import { getCutoff, localize, type Novica } from '../lib/novice';
+import { renderMarkdown } from '../lib/markdown';
+import { formatDate, path, useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  entry: Novica;
+}
+const { lang, entry } = Astro.props;
+const t = useTranslations(lang);
+const { title, excerpt, bodyEn, fallback } = localize(entry, lang);
+const { Content } = await render(entry);
+const d = entry.data;
+const archived = d.date < (await getCutoff());
+const listKey = archived ? 'archive' : 'news';
+const related = (await getCollection('arhiv', (a) => a.data.novica === entry.id))[0];
+// naslovna slika se ne ponovi, če je že prva v galeriji
+const gallery = d.gallery ?? [];
+const showCover = d.cover && gallery.length === 0;
+const coverAlt = (lang === 'en' ? d.cover_alt_en || d.cover_alt : d.cover_alt) ?? title;
+---
+
+<BaseLayout lang={lang} title={title} description={excerpt} image={d.cover} type="article">
+  <PageHeader
+    lang={lang}
+    title={title}
+    crumbs={[{ label: t(archived ? 'nav.archive' : 'nav.news'), href: path(lang, listKey) }]}
+  />
+  <article class="container section">
+    <p class="meta">
+      <Icon name="calendar" size={18} />
+      <time datetime={d.date.toISOString().slice(0, 10)}>{formatDate(d.date, lang)}</time>
+    </p>
+    {fallback && <p class="note">{t('news.slOnly')}</p>}
+
+    {
+      showCover && (
+        <figure class="cover">
+          <Image src={d.cover!} alt={coverAlt} widths={[640, 960, 1280]} sizes="(max-width: 900px) 100vw, 860px" />
+        </figure>
+      )
+    }
+
+    <div class="prose" lang={fallback ? 'sl' : undefined}>
+      {lang === 'en' && bodyEn ? <Fragment set:html={renderMarkdown(bodyEn)} /> : <Content />}
+    </div>
+
+    {
+      gallery.length > 0 && (
+        <section class="post-gallery" aria-labelledby="gallery-title">
+          <h2 id="gallery-title">{t('gallery.title')}</h2>
+          <Gallery lang={lang} images={gallery} title={title} />
+        </section>
+      )
+    }
+
+    {
+      related && (
+        <p class="note">
+          {t('news.relatedGallery')}:{' '}
+          <a href={path(lang, 'archive', related.id)}>
+            {(lang === 'en' && related.data.title_en) || related.data.title}
+          </a>
+        </p>
+      )
+    }
+
+    <p class="back">
+      <a class="btn btn--ghost" href={path(lang, listKey)}>
+        <Icon name="arrow-left" size={18} /> {t(archived ? 'news.backArchive' : 'news.back')}
+      </a>
+    </p>
+  </article>
+</BaseLayout>
+
+<style>
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--accent-light);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .cover {
+    max-width: 860px;
+    margin: 0 0 2.5rem;
+  }
+  .post-gallery {
+    margin: 3rem 0;
+  }
+  .post-gallery h2 {
+    font-size: 1.5rem;
+  }
+  .back {
+    margin-top: 3rem;
+  }
+</style>

@@ -1,0 +1,39 @@
+# Cenik. Besedilo cene je prosto (npr. "35 € / mesec").
+sklopi:
+  - id: clanarina
+    naslov: Članarina
+    naslov_en: Membership fee
+    postavke:
+      - { opis: Članarina, opis_en: Membership fee, cena: 15 € / sezono, cena_en: € 15 / season }
+  - id: zacetniki
+    naslov: Začetniki
+    naslov_en: Beginners
+    postavke:
+      - { opis: 1x tedensko, opis_en: Once a week, cena: 35 € / mesec, cena_en: € 35 / month }
+      - { opis: 2x tedensko, opis_en: Twice a week, cena: 50 € / mesec, cena_en: € 50 / month }
+  - id: tekmovalci
+    naslov: Tekmovalci
+    naslov_en: Competitors
+    postavke:
+      - { opis: 2x tedensko, opis_en: Twice a week, cena: 50 € / mesec, cena_en: € 50 / month }
+      - { opis: 3x tedensko, opis_en: Three times a week, cena: 60 € / mesec, cena_en: € 60 / month }
+  - id: odrasli
+    naslov: Odrasli
+    naslov_en: Adults
+    postavke:
+      - { opis: 1x tedensko, opis_en: Once a week, cena: 35 € / mesec, cena_en: € 35 / month }
+      - { opis: 2x tedensko, opis_en: Twice a week, cena: 50 € / mesec, cena_en: € 50 / month }
+      - { opis: Posamezen obisk, opis_en: Single session, cena: 20 €, cena_en: € 20 }
+  - id: individualni
+    naslov: Individualni treningi
+    naslov_en: Individual lessons
+    postavke:
+      - { opis: "1x tedensko (30 min) ob redni vadbi", opis_en: "Once a week (30 min) alongside regular training", cena: 40 € / mesec, cena_en: € 40 / month }
+      - { opis: Posamezen trening, opis_en: Single lesson, cena: 20 € / 30 min, cena_en: € 20 / 30 min }
+  - id: izposoja
+    naslov: Izposoja opreme
+    naslov_en: Equipment rental
+    postavke:
+      - { opis: Prvi trije meseci za nove člane, opis_en: First three months for new members, cena: brezplačno, cena_en: free }
+    opomba: Otroci začnejo s plastično opremo, odrasli s pravo opremo, ki jo posodi klub.
+    opomba_en: Children start with plastic equipment; adults use real equipment lent by the club.

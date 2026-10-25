@@ -1,0 +1,11 @@
+---
+import ContentPage from './ContentPage.astro';
+import type { Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<ContentPage lang={lang} id="sabljanje" image="og.jpg" />

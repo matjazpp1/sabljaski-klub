@@ -1,0 +1,12 @@
+---
+import NewsPostPage from '../../../views/NewsPostPage.astro';
+import { getPublishedNews, slugOf } from '../../../lib/novice';
+
+export async function getStaticPaths() {
+  const news = await getPublishedNews();
+  return news.map((entry) => ({ params: { slug: slugOf(entry) }, props: { entry } }));
+}
+const { entry } = Astro.props;
+---
+
+<NewsPostPage lang="en" entry={entry} />

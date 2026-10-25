@@ -1,0 +1,106 @@
+---
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Gallery from '../components/Gallery.astro';
+import Icon from '../components/Icon.astro';
+import type { ArhivEntry } from '../lib/arhiv';
+import { localize, slugOf } from '../lib/novice';
+import { renderMarkdown } from '../lib/markdown';
+import { path, useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  entry: ArhivEntry;
+}
+const { lang, entry } = Astro.props;
+const t = useTranslations(lang);
+const en = lang === 'en';
+const d = entry.data;
+const title = (en && d.title_en) || d.title;
+const { Content } = await render(entry);
+const hasBody = Boolean(entry.body?.trim());
+const news = d.novica ? await getEntry('novice', d.novica) : undefined;
+const season = d.sezona.replace('/', '/20');
+---
+
+<BaseLayout lang={lang} title={title} description={`${t('nav.archive')} – ${t('archive.season')} ${season}: ${title}`} image={d.cover}>
+  <PageHeader
+    lang={lang}
+    title={title}
+    lead={`${t(d.vrsta === 'liga' ? 'archive.league' : 'archive.gallery')} · ${t('archive.season')} ${season}`}
+    crumbs={[{ label: t('nav.archive'), href: path(lang, 'archive') }]}
+    image="pas-2.jpg"
+  />
+  <div class="container section">
+    {
+      hasBody && (
+        <div class="prose">
+          {en && d.body_en ? <Fragment set:html={renderMarkdown(d.body_en)} /> : <Content />}
+        </div>
+      )
+    }
+
+    {
+      news && (
+        <p class="note">
+          {t('archive.relatedNews')}: <a href={path(lang, 'news', slugOf(news))}>{localize(news, lang).title}</a>
+        </p>
+      )
+    }
+
+    {
+      d.video?.length && (
+        <section class="videos" aria-labelledby="video-title">
+          <h2 id="video-title">{t('video.title')}</h2>
+          <ul>
+            {d.video.map((id, i) => (
+              <li>
+                <a class="btn btn--ghost" href={`https://www.youtube.com/watch?v=${id}`} target="_blank" rel="noopener">
+                  {t('video.watch')} {d.video!.length > 1 ? i + 1 : ''} <Icon name="external" size={16} />
+                  <span class="visually-hidden">{t('nav.newTab')}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      d.slike?.length && (
+        <section aria-labelledby="gallery-title" class="gal">
+          <h2 id="gallery-title">{t('gallery.title')}</h2>
+          <Gallery lang={lang} images={d.slike} title={title} />
+        </section>
+      )
+    }
+
+    <p class="back">
+      <a class="btn btn--ghost" href={path(lang, 'archive')}>
+        <Icon name="arrow-left" size={18} /> {t('news.backArchive')}
+      </a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .videos ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 0 0 2.5rem;
+    padding: 0;
+    list-style: none;
+  }
+  .videos h2,
+  .gal h2 {
+    font-size: 1.5rem;
+  }
+  .gal {
+    margin-top: 2.5rem;
+  }
+  .back {
+    margin-top: 3rem;
+  }
+</style>

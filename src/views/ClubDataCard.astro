@@ -1,0 +1,33 @@
+---
+import { getEntry } from 'astro:content';
+import { useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const k = (await getEntry('kontakt', 'kontakt'))!.data;
+---
+
+<div class="side-card">
+  <h2>{t('club.data')}</h2>
+  <dl>
+    <dt>{t('club.name')}</dt>
+    <dd>{k.klub}</dd>
+    <dt>{t('club.address')}</dt>
+    <dd>{k.naslov}, {k.posta}</dd>
+    <dt>{t('footer.taxId')}</dt>
+    <dd>{k.davcna}</dd>
+    <dt>{t('footer.iban')}</dt>
+    <dd>{k.trr}</dd>
+    <dt>{t('club.bank')}</dt>
+    <dd>{k.banka}</dd>
+    <dt>{t('contact.person')}</dt>
+    <dd>
+      {k.kontaktna_oseba}<br />
+      <a href={`tel:+386${k.telefon.replace(/\s/g, '').replace(/^0/, '')}`}>{k.telefon}</a><br />
+      <a href={`mailto:${k.email}`}>{k.email}</a>
+    </dd>
+  </dl>
+</div>

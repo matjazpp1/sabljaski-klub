@@ -1,0 +1,341 @@
+/* Oblikovni žetoni (design tokens) – barve, pisava, razmiki */
+:root {
+  --accent: #2f6b4f; /* glavna zelena – gumbi, pasovi (bela 6,3:1) */
+  --accent-hover: #285d45;
+  --accent-light: #6aa888; /* naslovi in povezave na temni podlagi (≥ 6:1 na --bg) */
+  --accent-dark: #1e4535; /* globlji pasovi, ozadja kartic */
+  --bg: #0f1211;
+  --surface: #181c1a;
+  --surface-2: #202523;
+  --line: #2c3330;
+  --text: #f2f4f3;
+  --muted: #a7b0ac;
+
+  --font: 'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fs-body: 1.125rem; /* 18 px */
+  --fs-small: 0.95rem;
+  --fs-h1: clamp(2.4rem, 5.5vw, 4.5rem);
+  --fs-h2: clamp(1.9rem, 3.6vw, 2.9rem);
+  --fs-h3: 1.4rem;
+
+  --container: 1200px;
+  --gutter: clamp(1rem, 4vw, 2rem);
+  --section: clamp(4rem, 9vw, 7.5rem);
+  --radius: 2px;
+  --header-h: 84px;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0 0 0.6em;
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+}
+h2 {
+  font-size: var(--fs-h2);
+}
+h3 {
+  font-size: var(--fs-h3);
+}
+
+p {
+  margin: 0 0 1.1em;
+}
+
+a {
+  color: var(--accent-light);
+  text-underline-offset: 0.2em;
+}
+a:hover {
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent-light);
+  outline-offset: 3px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100px;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  padding-block: var(--section);
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--accent-light);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.lead {
+  color: var(--muted);
+  font-size: 1.2rem;
+  max-width: 60ch;
+}
+
+/* Gumbi */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 48px;
+  padding: 0.8rem 1.6rem;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s,
+    transform 0.2s var(--ease);
+}
+.btn:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: #fff;
+}
+.btn svg {
+  transition: transform 0.2s var(--ease);
+}
+.btn:hover svg {
+  transform: translateX(3px);
+}
+.btn--ghost {
+  background: transparent;
+  border-color: var(--text);
+  color: var(--text);
+}
+.btn--ghost:hover {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg);
+}
+.btn--light {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--accent-dark);
+}
+.btn--light:hover {
+  background: #fff;
+  border-color: #fff;
+  color: var(--bg);
+}
+
+/* Animacija ob pomikanju – le če uporabnik ni izklopil gibanja in je JS na voljo */
+@media (prefers-reduced-motion: no-preference) {
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.7s var(--ease),
+      transform 0.7s var(--ease);
+  }
+  .js .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+main:focus {
+  outline: none;
+}
+
+/* Besedilo iz Markdowna (novice, vsebinske strani) */
+.prose {
+  max-width: 72ch;
+}
+.prose h2 {
+  margin-top: 2.5rem;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  color: var(--accent-light);
+}
+.prose h3 {
+  margin-top: 2rem;
+  font-size: 1.25rem;
+}
+.prose > :first-child {
+  margin-top: 0;
+}
+.prose ul,
+.prose ol {
+  margin: 0 0 1.2em;
+  padding-left: 1.25em;
+}
+.prose li {
+  margin-bottom: 0.35em;
+}
+.prose li::marker {
+  color: var(--accent-light);
+}
+.prose strong {
+  color: #fff;
+}
+.prose a {
+  overflow-wrap: anywhere;
+}
+.prose img {
+  margin: 1.5rem 0;
+}
+.prose table {
+  width: 100%;
+  margin: 0 0 2rem;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+.prose th,
+.prose td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.prose th {
+  color: var(--muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.prose td:last-child,
+.prose th:last-child {
+  text-align: right;
+}
+.prose tbody tr:nth-child(-n + 3) td {
+  color: #fff;
+  font-weight: 600;
+}
+
+.note {
+  padding: 1rem 1.25rem;
+  margin-bottom: 2rem;
+  border-left: 3px solid var(--accent-light);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.page-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+}
+@media (max-width: 960px) {
+  .page-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.side-card {
+  padding: 1.75rem;
+  background: var(--surface);
+  border-top: 3px solid var(--accent);
+  font-size: 1rem;
+}
+.side-card h2 {
+  font-size: 1.15rem;
+  letter-spacing: 0.1em;
+  color: var(--accent-light);
+}
+.side-card dl {
+  margin: 0;
+}
+.side-card dt {
+  color: var(--muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.side-card dd {
+  margin: 0 0 0.9rem;
+}
+.side-card .btn {
+  width: 100%;
+  margin-top: 0.5rem;
+}

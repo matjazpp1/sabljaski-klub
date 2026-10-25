@@ -1,0 +1,46 @@
+---
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { renderMarkdown } from '../lib/markdown';
+import { useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  /** Ime datoteke v src/content/strani/ (brez .md). */
+  id: 'klub' | 'dvorana' | 'oprema' | 'zacni' | 'sabljanje';
+  crumbs?: { label: string; href?: string }[];
+  image?: string;
+  lead?: string;
+}
+const { lang, id, crumbs, image, lead } = Astro.props;
+const t = useTranslations(lang);
+const entry = (await getEntry('strani', id))!;
+const en = lang === 'en';
+const title = en ? entry.data.title_en : entry.data.title;
+const description = en ? entry.data.description_en : entry.data.description;
+const { Content } = await render(entry);
+const fallback = en && !entry.data.body_en;
+---
+
+<BaseLayout lang={lang} title={title} description={description}>
+  <PageHeader lang={lang} title={title} crumbs={crumbs} image={image} lead={lead} />
+  <div class="container section">
+    <div class:list={[{ 'page-grid': Astro.slots.has('aside') }]}>
+      <div>
+        {fallback && <p class="note" lang="en">{t('news.slOnly')}</p>}
+        <div class="prose" lang={fallback ? 'sl' : undefined}>
+          {en && !fallback ? <Fragment set:html={renderMarkdown(entry.data.body_en)} /> : <Content />}
+        </div>
+        <slot />
+      </div>
+      {
+        Astro.slots.has('aside') && (
+          <aside>
+            <slot name="aside" />
+          </aside>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>

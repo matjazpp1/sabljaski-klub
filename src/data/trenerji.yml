@@ -1,0 +1,28 @@
+# Trenerji. Portret (foto) dodajte v src/assets/trenerji/ – dokler ga ni, se prikažejo inicialke.
+trenerji:
+  - id: jure-jeza
+    ime: Jure Jeza
+    vloga: Glavni trener
+    vloga_en: Head coach
+    reference:
+      - sl: Profesor športne vzgoje (Fakulteta za šport)
+        en: Physical education teacher (Faculty of Sport)
+      - sl: Mentor študentom programa Športno treniranje – sabljanje
+        en: Mentor to students of the Sports Coaching programme – fencing
+      - sl: Trener za meč in floret s slovensko in mednarodno licenco
+        en: Épée and foil coach with Slovenian and international licences
+      - sl: Mednarodni FIE sodnik za meč
+        en: International FIE épée referee
+  - id: eva-jeza
+    ime: Eva Jeza
+    vloga: Vaditeljica sabljanja
+    vloga_en: Fencing instructor
+    reference:
+      - sl: Diplomantka kineziologije (Fakulteta za šport)
+        en: Graduate in kinesiology (Faculty of Sport)
+      - sl: Magistrica kineziologije (Fakulteta za vede o zdravju)
+        en: Master's degree in kinesiology (Faculty of Health Sciences)
+      - sl: Vaditeljica sabljanja
+        en: Fencing instructor
+      - sl: Mednarodna FIE sodnica za meč
+        en: International FIE épée referee

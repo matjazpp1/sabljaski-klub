@@ -1,0 +1,316 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroSlider from '../components/HeroSlider.astro';
+import NewsCard from '../components/NewsCard.astro';
+import Icon from '../components/Icon.astro';
+import { getCurrentNews } from '../lib/novice';
+import { stockImage } from '../lib/stock';
+import { path, useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const latest = (await getCurrentNews()).slice(0, 3);
+
+const ctaCards = [
+  { icon: 'user', title: t('home.cards.beginners.title'), text: t('home.cards.beginners.text'), href: path(lang, 'start') },
+  { icon: 'calendar', title: t('home.cards.schedule.title'), text: t('home.cards.schedule.text'), href: path(lang, 'schedule') },
+  { icon: 'target', title: t('home.cards.private.title'), text: t('home.cards.private.text'), href: `${path(lang, 'prices')}#individualni` },
+] as const;
+
+const bandCards = [
+  { img: 'pas-1.jpg', title: t('home.coaches.title'), text: t('home.coaches.text'), btn: t('home.coaches.btn'), href: path(lang, 'coaches') },
+  { img: 'pas-2.jpg', title: t('home.venue.title'), text: t('home.venue.text'), btn: t('home.venue.btn'), href: path(lang, 'venue') },
+];
+---
+
+<BaseLayout lang={lang}>
+  <HeroSlider lang={lang} />
+
+  <!-- Tri kartice s klici k dejanju -->
+  <section class="cta" aria-label={t('nav.training')}>
+    <div class="container cta__grid">
+      {
+        ctaCards.map((c) => (
+          <a class="cta__card reveal" href={c.href}>
+            <Icon name={c.icon} size={34} />
+            <h2>{c.title}</h2>
+            <p>{c.text}</p>
+            <span class="cta__arrow">
+              <Icon name="arrow" />
+            </span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- O nas -->
+  <section class="about section" aria-labelledby="about-title">
+    <img class="about__mark" src="/icon.png" alt="" width="512" height="512" loading="lazy" />
+    <div class="container about__inner reveal">
+      <span class="eyebrow">{t('site.short')}</span>
+      <h2 id="about-title">{t('home.about.title')}</h2>
+      <p class="lead">{t('home.about.text')}</p>
+      <a class="btn btn--ghost" href={path(lang, 'about')}>{t('home.about.btn')} <Icon name="arrow" size={18} /></a>
+    </div>
+  </section>
+
+  <!-- Pas v poudarni barvi: trenerji in dvorana -->
+  <section class="band" aria-label={`${t('nav.coaches')}, ${t('nav.venue')}`}>
+    <div class="container band__grid">
+      {
+        bandCards.map((c) => (
+          <article class="band__card reveal">
+            <Image src={stockImage(c.img)} alt="" widths={[480, 720, 960]} sizes="(max-width: 800px) 100vw, 560px" class="band__img" />
+            <div class="band__text">
+              <h2>{c.title}</h2>
+              <p>{c.text}</p>
+              <a class="btn btn--light" href={c.href}>
+                {c.btn} <Icon name="arrow" size={18} />
+              </a>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Novice -->
+  {
+    latest.length > 0 && (
+      <section class="news section" aria-labelledby="news-title">
+        <div class="container">
+          <div class="news__head">
+            <h2 id="news-title">{t('home.news.title')}</h2>
+            <a class="btn btn--ghost" href={path(lang, 'news')}>
+              {t('home.news.all')} <Icon name="arrow" size={18} />
+            </a>
+          </div>
+          <div class="news__grid">
+            {latest.map((entry) => (
+              <div class="reveal">
+                <NewsCard entry={entry} lang={lang} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- Urnik -->
+  <section class="schedule" aria-labelledby="schedule-title">
+    <Image src={stockImage('pas-1.jpg')} alt="" widths={[960, 1600, 2400]} sizes="100vw" class="schedule__img" />
+    <div class="container schedule__inner reveal">
+      <h2 id="schedule-title">{t('home.schedule.title')}</h2>
+      <p class="lead">{t('home.schedule.text')}</p>
+      <a class="btn" href={path(lang, 'schedule')}>{t('home.schedule.btn')} <Icon name="arrow" size={18} /></a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Kartice CTA – delno prekrivajo spodnji rob uvoda */
+  .cta {
+    position: relative;
+    z-index: 5;
+    margin-top: -3.5rem;
+  }
+  .cta__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+  .cta__card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 2rem 3.5rem;
+    background: var(--surface);
+    border-top: 4px solid var(--accent);
+    color: var(--text);
+    text-decoration: none;
+    transition:
+      background-color 0.25s,
+      transform 0.25s var(--ease);
+  }
+  .cta__card > :global(svg:first-child) {
+    color: var(--accent-light);
+    margin-bottom: 1.25rem;
+  }
+  .cta__card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .cta__card p {
+    color: var(--muted);
+    font-size: 1rem;
+    margin: 0;
+  }
+  .cta__arrow {
+    position: absolute;
+    right: 1.5rem;
+    bottom: 1.25rem;
+    color: var(--accent-light);
+    transition: transform 0.25s var(--ease);
+  }
+  .cta__card:hover {
+    background: var(--accent-dark);
+    color: var(--text);
+  }
+  .cta__card:hover .cta__arrow {
+    transform: translateX(6px);
+  }
+
+  /* O nas */
+  .about {
+    position: relative;
+    overflow: hidden;
+  }
+  .about__mark {
+    position: absolute;
+    right: -6%;
+    top: 50%;
+    width: min(520px, 55vw);
+    transform: translateY(-50%) rotate(-8deg);
+    opacity: 0.05;
+    filter: grayscale(1) brightness(1.6);
+    pointer-events: none;
+  }
+  .about__inner {
+    position: relative;
+  }
+  .about__inner > * {
+    max-width: 860px;
+  }
+  .about .lead {
+    color: var(--text);
+    font-size: clamp(1.15rem, 1.8vw, 1.35rem);
+    margin-bottom: 2rem;
+  }
+
+  /* Pas v poudarni barvi */
+  .band {
+    padding-block: var(--section);
+    background:
+      linear-gradient(120deg, var(--accent-dark) 0%, var(--accent) 100%);
+  }
+  .band__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  .band__card {
+    position: relative;
+    min-height: 420px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .band__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--ease);
+  }
+  .band__card:hover .band__img {
+    transform: scale(1.04);
+  }
+  .band__card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(0deg, rgba(10, 14, 12, 0.92) 0%, rgba(10, 14, 12, 0.55) 55%, rgba(10, 14, 12, 0.25) 100%);
+  }
+  .band__text {
+    position: relative;
+    z-index: 2;
+    padding: clamp(1.75rem, 4vw, 2.75rem);
+  }
+  .band__text h2 {
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+  }
+  .band__text p {
+    margin-bottom: 1.5rem;
+  }
+
+  /* Novice */
+  .news__head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+  .news__head h2 {
+    margin: 0;
+  }
+  .news__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  /* Urnik */
+  .schedule {
+    position: relative;
+    padding-block: clamp(5rem, 11vw, 9rem);
+    overflow: hidden;
+    border-top: 1px solid var(--line);
+  }
+  .schedule__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+  }
+  .schedule::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(90deg, rgba(10, 14, 12, 0.94) 0%, rgba(10, 14, 12, 0.75) 60%, rgba(30, 69, 53, 0.6) 100%);
+  }
+  .schedule__inner {
+    position: relative;
+    z-index: 2;
+  }
+  .schedule .lead {
+    color: var(--text);
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: 960px) {
+    .cta {
+      margin-top: 0;
+      padding-top: 1.5rem;
+    }
+    .cta__grid,
+    .news__grid {
+      grid-template-columns: 1fr;
+    }
+    .band__grid {
+      grid-template-columns: 1fr;
+    }
+    .band__card {
+      min-height: 360px;
+    }
+  }
+  @media (min-width: 701px) and (max-width: 960px) {
+    .news__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

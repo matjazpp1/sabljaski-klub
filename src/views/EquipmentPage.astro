@@ -1,0 +1,98 @@
+---
+import { Image } from 'astro:assets';
+import ContentPage from './ContentPage.astro';
+import { useTranslations, type Lang } from '../i18n';
+import plastika from '../assets/strani/plasticna-oprema.jpg';
+import mec1 from '../assets/strani/mec-1.jpg';
+import mec2 from '../assets/strani/mec-2.jpg';
+import floret1 from '../assets/strani/floret-1.jpg';
+import floret2 from '../assets/strani/floret-2.jpg';
+import sablja1 from '../assets/strani/sablja-1.jpg';
+import sablja2 from '../assets/strani/sablja-2.jpg';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const weapons = [
+  { name: t('equipment.epee'), text: t('equipment.epee.text'), target: mec1, weapon: mec2 },
+  { name: t('equipment.foil'), text: t('equipment.foil.text'), target: floret1, weapon: floret2 },
+  { name: t('equipment.sabre'), text: t('equipment.sabre.text'), target: sablja1, weapon: sablja2 },
+];
+---
+
+<ContentPage lang={lang} id="oprema" crumbs={[{ label: t('nav.training') }]} image="hero-3.jpg">
+  <div slot="aside">
+    <figure class="side-figure">
+      <Image src={plastika} alt={t('equipment.plastic')} width={500} />
+      <figcaption>{t('equipment.plastic')}</figcaption>
+    </figure>
+  </div>
+
+  <ul class="weapons">
+    {
+      weapons.map((w) => (
+        <li>
+          <h3>{w.name}</h3>
+          <div class="weapons__img">
+            <Image src={w.target} alt={`${w.name}: ${t('equipment.target')}`} width={320} />
+          </div>
+          <Image src={w.weapon} alt={`${w.name}: ${t('equipment.weapon')}`} width={400} class="weapons__weapon" />
+          <p>{w.text}</p>
+        </li>
+      ))
+    }
+  </ul>
+</ContentPage>
+
+<style>
+  .side-figure {
+    margin: 0;
+  }
+  .side-figure figcaption {
+    margin-top: 0.6rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  .weapons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .weapons li {
+    padding: 1.5rem;
+    background: var(--surface);
+    border-top: 3px solid var(--accent);
+  }
+  .weapons h3 {
+    color: var(--accent-light);
+  }
+  .weapons__img {
+    padding: 1rem;
+    background: #fff;
+  }
+  .weapons__img img {
+    margin-inline: auto;
+    max-height: 220px;
+    width: auto;
+  }
+  .weapons__weapon {
+    margin: 0.75rem 0;
+    padding: 0.5rem;
+    background: #fff;
+  }
+  .weapons p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 1rem;
+  }
+  @media (max-width: 800px) {
+    .weapons {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

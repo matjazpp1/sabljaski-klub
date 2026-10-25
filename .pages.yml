@@ -1,0 +1,460 @@
+# Konfiguracija spletnega urejevalnika Pages CMS (https://pagescms.org)
+# Urejevalnik bere to datoteko iz repozitorija; spremembe veljajo takoj po shranjevanju.
+
+media:
+  - name: novice
+    label: Slike novic
+    input: src/assets/novice
+    output: ../../assets/novice
+    categories: [image]
+    rename: true
+  - name: arhiv
+    label: Slike arhiva
+    input: src/assets/arhiv
+    output: ../../assets/arhiv
+    categories: [image]
+    rename: true
+  - name: trenerji
+    label: Portreti trenerjev
+    input: src/assets/trenerji
+    output: ../assets/trenerji
+    categories: [image]
+    rename: true
+
+content:
+  # ---------------------------------------------------------------- NOVICE
+  - name: novice
+    label: Novice
+    type: collection
+    path: src/content/novice
+    format: yaml-frontmatter
+    filename: "{year}-{month}-{day}-{primary}.md"
+    view:
+      fields: [title, date, draft]
+      primary: title
+      sort: [date, title]
+      search: [title, excerpt]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Naslov
+        type: string
+        required: true
+      - name: date
+        label: Datum
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: draft
+        label: Osnutek (ne objavi še)
+        description: Ko je obkljukano, novica ni vidna na strani.
+        type: boolean
+        default: false
+      - name: cover
+        label: Naslovna slika
+        description: Prikaže se na kartici novice in na vrhu novice. Najbolje ležeča slika.
+        type: image
+        options:
+          media: novice
+          path: src/assets/novice
+      - name: cover_alt
+        label: Opis naslovne slike
+        description: Kratek opis, kaj je na sliki (za slabovidne in iskalnike).
+        type: string
+      - name: excerpt
+        label: Povzetek
+        description: 1–2 povedi za kartico novice. Če ga ne vpišeš, se uporabi začetek besedila.
+        type: text
+      - name: body
+        label: Besedilo
+        type: rich-text
+        options:
+          format: markdown
+          media: false
+      - name: gallery
+        label: Galerija
+        description: Dodatne fotografije, ki se prikažejo pod besedilom.
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{alt} ({index})"
+        fields:
+          - name: image
+            label: Slika
+            type: image
+            required: true
+            options:
+              media: novice
+              path: src/assets/novice
+          - name: alt
+            label: Opis slike
+            type: string
+      - name: title_en
+        label: Naslov (angleško)
+        description: Če angleškega prevoda ni, angleška stran pokaže slovensko besedilo z opombo.
+        type: string
+      - name: excerpt_en
+        label: Povzetek (angleško)
+        type: text
+      - name: body_en
+        label: Besedilo (angleško)
+        type: rich-text
+        options:
+          format: markdown
+          media: false
+
+  # ---------------------------------------------------------------- URNIK
+  - name: urnik
+    label: Urnik
+    type: file
+    path: src/data/urnik.yml
+    format: yaml
+    fields:
+      - name: skupine
+        label: Skupine
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{skupina}"
+        fields:
+          - name: id
+            label: Oznaka
+            type: string
+            hidden: true
+          - name: skupina
+            label: Ime skupine
+            type: string
+            required: true
+          - name: skupina_en
+            label: Ime skupine (angleško)
+            type: string
+          - name: opis
+            label: Kratek opis (neobvezno)
+            type: text
+          - name: opis_en
+            label: Kratek opis (angleško)
+            type: text
+          - name: termini
+            label: Termini
+            type: object
+            list: true
+            fields:
+              - name: dan
+                label: Dan
+                type: select
+                required: true
+                options:
+                  values:
+                    - { name: pon, label: Ponedeljek }
+                    - { name: tor, label: Torek }
+                    - { name: sre, label: Sreda }
+                    - { name: cet, label: Četrtek }
+                    - { name: pet, label: Petek }
+                    - { name: sob, label: Sobota }
+                    - { name: ned, label: Nedelja }
+              - name: od
+                label: Od (npr. 16:45)
+                type: string
+                required: true
+              - name: do
+                label: Do (npr. 18:00)
+                type: string
+                required: true
+
+  # ---------------------------------------------------------------- CENIK
+  - name: cenik
+    label: Cenik
+    type: file
+    path: src/data/cenik.yml
+    format: yaml
+    fields:
+      - name: sklopi
+        label: Sklopi cenika
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{naslov}"
+        fields:
+          - name: id
+            label: Oznaka
+            type: string
+            hidden: true
+          - name: naslov
+            label: Naslov sklopa
+            type: string
+            required: true
+          - name: naslov_en
+            label: Naslov sklopa (angleško)
+            type: string
+          - name: postavke
+            label: Postavke
+            type: object
+            list: true
+            fields:
+              - name: opis
+                label: Opis (npr. 2x tedensko)
+                type: string
+                required: true
+              - name: opis_en
+                label: Opis (angleško)
+                type: string
+              - name: cena
+                label: Cena (npr. 50 € / mesec)
+                type: string
+                required: true
+              - name: cena_en
+                label: Cena (angleško, npr. € 50 / month)
+                type: string
+          - name: opomba
+            label: Opomba (neobvezno)
+            type: text
+          - name: opomba_en
+            label: Opomba (angleško)
+            type: text
+
+  # ---------------------------------------------------------------- TRENERJI
+  - name: trenerji
+    label: Trenerji
+    type: file
+    path: src/data/trenerji.yml
+    format: yaml
+    fields:
+      - name: trenerji
+        label: Trenerji
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{ime}"
+        fields:
+          - name: id
+            label: Oznaka
+            type: string
+            hidden: true
+          - name: ime
+            label: Ime in priimek
+            type: string
+            required: true
+          - name: vloga
+            label: Vloga (npr. Glavni trener)
+            type: string
+            required: true
+          - name: vloga_en
+            label: Vloga (angleško)
+            type: string
+          - name: foto
+            label: Portret
+            description: Pokončna fotografija. Dokler je ni, se prikažejo inicialke.
+            type: image
+            options:
+              media: trenerji
+              path: src/assets/trenerji
+          - name: reference
+            label: Reference
+            type: object
+            list: true
+            fields:
+              - name: sl
+                label: Slovensko
+                type: string
+                required: true
+              - name: en
+                label: Angleško
+                type: string
+
+  # ---------------------------------------------------------------- KONTAKT
+  - name: kontakt
+    label: Kontakt in podatki društva
+    type: file
+    path: src/data/kontakt.yml
+    format: yaml
+    fields:
+      - { name: klub, label: Ime društva, type: string, required: true }
+      - { name: naslov, label: Naslov (ulica in številka), type: string, required: true }
+      - { name: posta, label: Pošta (npr. 1000 Ljubljana), type: string, required: true }
+      - { name: dvorana, label: Dvorana, type: string, required: true }
+      - { name: dvorana_en, label: Dvorana (angleško), type: string, required: true }
+      - { name: kontaktna_oseba, label: Kontaktna oseba, type: string, required: true }
+      - { name: telefon, label: Telefon (npr. 041 254 017), type: string, required: true }
+      - { name: email, label: E-pošta, type: string, required: true }
+      - { name: davcna, label: Davčna številka, type: string, required: true }
+      - { name: trr, label: TRR, type: string, required: true }
+      - { name: banka, label: Banka, type: string, required: true }
+      - { name: facebook, label: Facebook (celoten naslov), type: string, required: true }
+      - { name: instagram, label: Instagram (celoten naslov), type: string, required: true }
+      - { name: zemljevid, label: Povezava na zemljevid, type: string, required: true }
+      - { name: lat, label: Zemljepisna širina, type: number, required: true }
+      - { name: lon, label: Zemljepisna dolžina, type: number, required: true }
+
+  # ---------------------------------------------------------------- ARHIV
+  - name: arhiv
+    label: Arhiv (galerije in lige)
+    type: collection
+    path: src/content/arhiv
+    format: yaml-frontmatter
+    filename: "{primary}.md"
+    view:
+      fields: [title, sezona, vrsta]
+      primary: title
+      sort: [datum, title]
+      default:
+        sort: datum
+        order: desc
+    fields:
+      - name: title
+        label: Naslov
+        type: string
+        required: true
+      - name: title_en
+        label: Naslov (angleško)
+        type: string
+      - name: vrsta
+        label: Vrsta
+        type: select
+        required: true
+        options:
+          values:
+            - { name: galerija, label: Galerija }
+            - { name: liga, label: Klubska liga }
+      - name: sezona
+        label: Sezona (npr. 2016/17)
+        type: string
+        required: true
+      - name: datum
+        label: Datum dogodka
+        description: Uporablja se le za vrstni red znotraj sezone.
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: cover
+        label: Naslovna slika
+        type: image
+        options:
+          media: arhiv
+          path: src/assets/arhiv
+      - name: slike
+        label: Fotografije
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{alt} ({index})"
+        fields:
+          - name: image
+            label: Slika
+            type: image
+            required: true
+            options:
+              media: arhiv
+              path: src/assets/arhiv
+          - name: alt
+            label: Opis slike (neobvezno)
+            type: string
+      - name: video
+        label: Videi YouTube (oznaka videa, npr. SOqU5M-J1V8)
+        type: string
+        list: true
+      - name: novica
+        label: Povezana novica (ime datoteke brez .md, neobvezno)
+        type: string
+      - name: body
+        label: Besedilo (neobvezno, npr. lestvica lige)
+        type: rich-text
+        options:
+          format: markdown
+          media: false
+      - name: body_en
+        label: Besedilo (angleško)
+        type: rich-text
+        options:
+          format: markdown
+          media: false
+
+  # ---------------------------------------------------------------- STRANI
+  - name: strani
+    label: Besedila strani
+    type: collection
+    path: src/content/strani
+    format: yaml-frontmatter
+    operations:
+      create: false
+      delete: false
+      rename: false
+    view:
+      fields: [title]
+      primary: title
+    fields:
+      - { name: title, label: Naslov, type: string, required: true }
+      - { name: title_en, label: Naslov (angleško), type: string, required: true }
+      - { name: description, label: Opis za iskalnike, type: text, required: true }
+      - { name: description_en, label: Opis za iskalnike (angleško), type: text, required: true }
+      - name: body
+        label: Besedilo
+        type: rich-text
+        options:
+          format: markdown
+          media: false
+      - name: body_en
+        label: Besedilo (angleško)
+        type: rich-text
+        options:
+          format: markdown
+          media: false
+
+  # ---------------------------------------------------------------- NASTAVITVE
+  - name: nastavitve
+    label: Nastavitve strani
+    type: file
+    path: src/data/nastavitve.yml
+    format: yaml
+    fields:
+      - name: novice_od
+        label: Novice od datuma (starejše gredo v Arhiv)
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: novic_na_stran
+        label: Število novic na stran
+        type: number
+        required: true
+      - name: rojstni_dnevi
+        label: Povezava »Rojstni dnevi«
+        type: string
+        required: true
+      - name: hero
+        label: Slajdi na naslovnici
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{naslov}"
+        fields:
+          - name: slika
+            label: Ime fotografije v mapi src/assets/stock (npr. hero-1.jpg)
+            type: string
+            required: true
+          - { name: alt, label: Opis fotografije, type: string, required: true }
+          - { name: alt_en, label: Opis fotografije (angleško), type: string, required: true }
+          - { name: naslov, label: Naslov, type: string, required: true }
+          - { name: naslov_en, label: Naslov (angleško), type: string, required: true }
+          - { name: podnaslov, label: Podnaslov, type: text, required: true }
+          - { name: podnaslov_en, label: Podnaslov (angleško), type: text, required: true }
+          - name: gumb
+            label: Gumb vodi na
+            type: select
+            required: true
+            options:
+              values:
+                - { name: zacni, label: Začni s sabljanjem }
+                - { name: urnik, label: Urnik }
+                - { name: cenik, label: Cenik }
+                - { name: trenerji, label: Trenerji }
+                - { name: kontakt, label: Kontakt }

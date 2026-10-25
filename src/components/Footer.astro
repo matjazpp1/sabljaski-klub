@@ -1,0 +1,186 @@
+---
+import { getEntry } from 'astro:content';
+import { getOrdered } from '../lib/data';
+import Icon from './Icon.astro';
+import { path, useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const kontakt = (await getEntry('kontakt', 'kontakt'))!.data;
+const skupine = await getOrdered('urnik');
+const year = new Date().getFullYear();
+const en = lang === 'en';
+---
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <section aria-labelledby="f-training">
+      <h2 id="f-training" class="footer-title"><Icon name="clock" /> {t('footer.training')}</h2>
+      <dl class="hours">
+        {
+          skupine.map(({ data }) => (
+            <div>
+              <dt>{(en && data.skupina_en) || data.skupina}</dt>
+              <dd>
+                {data.termini.map((tm) => (
+                  <span>
+                    <abbr title={t(`days.${tm.dan}`)}>{t(`days.short.${tm.dan}`)}</abbr> {tm.od}–{tm.do}
+                  </span>
+                ))}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+      <a href={path(lang, 'schedule')}>{t('nav.schedule')} →</a>
+    </section>
+
+    <section aria-labelledby="f-location">
+      <h2 id="f-location" class="footer-title"><Icon name="pin" /> {t('footer.location')}</h2>
+      <address>
+        {en ? kontakt.dvorana_en : kontakt.dvorana}<br />
+        {kontakt.naslov}<br />
+        {kontakt.posta}
+      </address>
+      <a href={kontakt.zemljevid} target="_blank" rel="noopener">
+        {t('footer.map')} <span class="visually-hidden">{t('nav.newTab')}</span>→
+      </a>
+    </section>
+
+    <section aria-labelledby="f-contact">
+      <h2 id="f-contact" class="footer-title"><Icon name="mail" /> {t('footer.contact')}</h2>
+      <p class="contact-lines">
+        {kontakt.kontaktna_oseba}<br />
+        <a href={`tel:+386${kontakt.telefon.replace(/\s/g, '').replace(/^0/, '')}`}>{kontakt.telefon}</a><br />
+        <a href={`mailto:${kontakt.email}`}>{kontakt.email}</a>
+      </p>
+      <div class="socials">
+        <a href={kontakt.instagram} target="_blank" rel="noopener">
+          <Icon name="instagram" size={22} />
+          <span class="visually-hidden">{t('social.instagram')} {t('nav.newTab')}</span>
+        </a>
+        <a href={kontakt.facebook} target="_blank" rel="noopener">
+          <Icon name="facebook" size={22} />
+          <span class="visually-hidden">{t('social.facebook')} {t('nav.newTab')}</span>
+        </a>
+      </div>
+    </section>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container footer-bottom__inner">
+      <a href={path(lang, 'home')} class="footer-logo">
+        <img src="/logo/zelva-svetla.png" alt={t('site.name')} width="540" height="141" loading="lazy" />
+      </a>
+      <p class="club-data">
+        <strong>{kontakt.klub}</strong>, {kontakt.naslov}, {kontakt.posta}<br />
+        {t('footer.taxId')}: {kontakt.davcna} · {t('footer.iban')}: {kontakt.trr} ({kontakt.banka})
+      </p>
+      <p class="copy">© {year} {kontakt.klub}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--surface);
+    border-top: 3px solid var(--accent);
+    font-size: 1rem;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+    padding-block: 4rem;
+  }
+  .footer-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+    color: var(--accent-light);
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+  }
+  .hours {
+    margin: 0 0 1rem;
+  }
+  .hours div {
+    margin-bottom: 0.75rem;
+  }
+  .hours dt {
+    font-weight: 700;
+  }
+  .hours dd {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.1rem 1rem;
+    margin: 0;
+    color: var(--muted);
+  }
+  .hours abbr {
+    text-decoration: none;
+    text-transform: capitalize;
+  }
+  address {
+    margin-bottom: 1rem;
+    font-style: normal;
+  }
+  .contact-lines {
+    margin-bottom: 1.25rem;
+  }
+  .socials {
+    display: flex;
+    gap: 0.75rem;
+  }
+  .socials a {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--line);
+    color: var(--text);
+  }
+  .socials a:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .footer-bottom {
+    border-top: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .footer-bottom__inner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 2rem;
+    padding-block: 1.75rem;
+  }
+  .footer-logo img {
+    width: 170px;
+  }
+  .club-data,
+  .copy {
+    margin: 0;
+  }
+  .club-data strong {
+    color: var(--text);
+  }
+
+  @media (max-width: 900px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      padding-block: 3rem;
+    }
+    .footer-bottom__inner {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+</style>

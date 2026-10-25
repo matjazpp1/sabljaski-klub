@@ -1,0 +1,98 @@
+---
+import { getEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { getOrdered } from '../lib/data';
+import { path, useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const en = lang === 'en';
+const sections = await getOrdered('cenik');
+const k = (await getEntry('kontakt', 'kontakt'))!.data;
+---
+
+<BaseLayout lang={lang} title={t('nav.prices')} description={t('prices.lead')}>
+  <PageHeader lang={lang} title={t('nav.prices')} crumbs={[{ label: t('nav.training') }]} lead={t('prices.lead')} image="hero-2.jpg" />
+  <div class="container section">
+    <div class="prices">
+      {
+        sections.map(({ data, id }) => (
+          <section class="price-card reveal" id={id} aria-labelledby={`p-${id}`}>
+            <h2 id={`p-${id}`}>{(en && data.naslov_en) || data.naslov}</h2>
+            <table>
+              <caption class="visually-hidden">{(en && data.naslov_en) || data.naslov}</caption>
+              <thead class="visually-hidden">
+                <tr>
+                  <th scope="col">{t('prices.item')}</th>
+                  <th scope="col">{t('prices.price')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.postavke.map((p) => (
+                  <tr>
+                    <th scope="row">{(en && p.opis_en) || p.opis}</th>
+                    <td>{(en && p.cena_en) || p.cena}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {(data.opomba || data.opomba_en) && <p class="price-note">{(en && data.opomba_en) || data.opomba}</p>}
+          </section>
+        ))
+      }
+    </div>
+    <p class="note" style="margin-top:3rem">
+      {t('prices.payment')}: <strong>{k.trr}</strong> ({k.banka}), {k.klub}.
+    </p>
+    <p><a class="btn" href={path(lang, 'schedule')}>{t('nav.schedule')}</a></p>
+  </div>
+</BaseLayout>
+
+<style>
+  .prices {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.25rem;
+  }
+  .price-card {
+    padding: 1.75rem;
+    background: var(--surface);
+    border-top: 3px solid var(--accent);
+  }
+  .price-card:target {
+    outline: 2px solid var(--accent-light);
+  }
+  .price-card h2 {
+    font-size: 1.3rem;
+    color: var(--accent-light);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    font-weight: 400;
+    padding-right: 1rem;
+  }
+  td {
+    font-weight: 700;
+    white-space: nowrap;
+    text-align: right;
+  }
+  .price-note {
+    margin: 1rem 0 0;
+    color: var(--muted);
+    font-size: 1rem;
+  }
+</style>

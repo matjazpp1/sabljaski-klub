@@ -1,0 +1,66 @@
+---
+import { alternatePath, languages, useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  /** Pot v drugem jeziku, kadar je ni mogoče izračunati samodejno. */
+  alternates?: Partial<Record<Lang, string>>;
+}
+const { lang, alternates = {} } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<ul class="lang" aria-label={t('lang.switch')}>
+  {
+    languages.map((l) => (
+      <li>
+        {l === lang ? (
+          <span aria-current="true" lang={l}>
+            <abbr title={t(`lang.${l}`)}>{l.toUpperCase()}</abbr>
+          </span>
+        ) : (
+          <a href={alternates[l] ?? alternatePath(Astro.url.pathname, l)} hreflang={l} lang={l}>
+            <abbr title={useTranslations(l)(`lang.${l}`)}>{l.toUpperCase()}</abbr>
+          </a>
+        )}
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .lang {
+    display: flex;
+    align-items: center;
+    margin: 0 0 0 0.25rem;
+    padding: 0;
+    list-style: none;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+  .lang li + li::before {
+    content: '|';
+    color: var(--line);
+    padding-inline: 0.15rem;
+  }
+  .lang a,
+  .lang span {
+    display: inline-block;
+    padding: 0.5rem 0.35rem;
+  }
+  .lang abbr {
+    text-decoration: none;
+  }
+  .lang span {
+    color: var(--accent-light);
+  }
+  .lang a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .lang a:hover {
+    color: var(--text);
+  }
+</style>

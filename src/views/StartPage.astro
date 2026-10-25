@@ -1,0 +1,50 @@
+---
+import { getEntry } from 'astro:content';
+import ContentPage from './ContentPage.astro';
+import Icon from '../components/Icon.astro';
+import { getOrdered } from '../lib/data';
+import { path, useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const k = (await getEntry('kontakt', 'kontakt'))!.data;
+const beginners = (await getOrdered('urnik'))[0]?.data;
+---
+
+<ContentPage lang={lang} id="zacni" crumbs={[{ label: t('nav.training') }]} image="hero-1.jpg" lead={t('start.lead')}>
+  <div slot="aside">
+    {
+      beginners && (
+        <div class="side-card">
+          <h2>
+            <Icon name="clock" /> {t('start.schedule')}
+          </h2>
+          <p>
+            <strong>{(lang === 'en' && beginners.skupina_en) || beginners.skupina}</strong>
+            <br />
+            {beginners.termini.map((tm) => (
+              <>
+                {t(`days.${tm.dan}`)} {tm.od}–{tm.do}
+                <br />
+              </>
+            ))}
+          </p>
+          <a href={path(lang, 'schedule')}>{t('nav.schedule')} →</a>
+        </div>
+      )
+    }
+    <div class="side-card" style="margin-top:1.25rem">
+      <h2>{t('start.contactTitle')}</h2>
+      <p>{t('start.contactText')}</p>
+      <p>
+        {k.kontaktna_oseba}<br />
+        <a href={`tel:+386${k.telefon.replace(/\s/g, '').replace(/^0/, '')}`}>{k.telefon}</a><br />
+        <a href={`mailto:${k.email}`}>{k.email}</a>
+      </p>
+      <a class="btn" href={`mailto:${k.email}`}><Icon name="mail" size={18} /> {t('email')}</a>
+    </div>
+  </div>
+</ContentPage>

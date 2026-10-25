@@ -1,0 +1,142 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Icon from '../components/Icon.astro';
+import { getOrdered } from '../lib/data';
+import { path, useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const en = lang === 'en';
+const groups = await getOrdered('urnik');
+const days = ['pon', 'tor', 'sre', 'cet', 'pet', 'sob', 'ned'] as const;
+const usedDays = days.filter((d) => groups.some((g) => g.data.termini.some((tm) => tm.dan === d)));
+const byDay = usedDays.map((d) => ({
+  day: d,
+  slots: groups
+    .flatMap((g) => g.data.termini.filter((tm) => tm.dan === d).map((tm) => ({ ...tm, group: (en && g.data.skupina_en) || g.data.skupina })))
+    .sort((a, b) => a.od.localeCompare(b.od)),
+}));
+---
+
+<BaseLayout lang={lang} title={t('nav.schedule')} description={t('schedule.lead')}>
+  <PageHeader lang={lang} title={t('nav.schedule')} crumbs={[{ label: t('nav.training') }]} lead={t('schedule.lead')} />
+  <div class="container section">
+    <div class="groups">
+      {
+        groups.map(({ data, id }) => (
+          <section class="group reveal" id={id} aria-labelledby={`g-${id}`}>
+            <h2 id={`g-${id}`}>{(en && data.skupina_en) || data.skupina}</h2>
+            {(en ? data.opis_en || data.opis : data.opis) && <p>{en ? data.opis_en || data.opis : data.opis}</p>}
+            <ul>
+              {data.termini.map((tm) => (
+                <li>
+                  <span>{t(`days.${tm.dan}`)}</span>
+                  <strong>
+                    {tm.od}–{tm.do}
+                  </strong>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+
+    <h2 class="week-title">{t('schedule.week')}</h2>
+    <div class="week">
+      {
+        byDay.map((d) => (
+          <section aria-label={t(`days.${d.day}`)}>
+            <h3>{t(`days.${d.day}`)}</h3>
+            <ul>
+              {d.slots.map((s) => (
+                <li>
+                  <strong>
+                    {s.od}–{s.do}
+                  </strong>
+                  <span>{s.group}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+
+    <p class="note" style="margin-top:3rem">{t('schedule.newMembers')}</p>
+    <p>
+      <a class="btn" href={path(lang, 'prices')}>{t('schedule.prices')} <Icon name="arrow" size={18} /></a>
+      <a class="btn btn--ghost" href={path(lang, 'start')}>{t('nav.start')}</a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+  }
+  .group {
+    padding: 1.75rem;
+    background: var(--surface);
+    border-top: 3px solid var(--accent);
+  }
+  .group h2 {
+    font-size: 1.3rem;
+    color: var(--accent-light);
+  }
+  .group ul,
+  .week ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .group li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .week-title {
+    margin-top: 4rem;
+    font-size: 1.6rem;
+  }
+  .week {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .week section {
+    padding: 1.25rem;
+    background: var(--bg);
+  }
+  .week h3 {
+    font-size: 1rem;
+    letter-spacing: 0.12em;
+    color: var(--accent-light);
+  }
+  .week li {
+    display: grid;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+  }
+  .week li span {
+    color: var(--muted);
+  }
+  .btn + .btn {
+    margin-left: 0.75rem;
+  }
+  @media (max-width: 500px) {
+    .btn + .btn {
+      margin: 0.75rem 0 0;
+    }
+  }
+</style>

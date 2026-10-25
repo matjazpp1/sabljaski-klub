@@ -1,0 +1,12 @@
+---
+import NewsListPage from '../../../views/NewsListPage.astro';
+import { getNewsPageCount } from '../../../lib/novice';
+
+export async function getStaticPaths() {
+  const pages = await getNewsPageCount();
+  return Array.from({ length: pages - 1 }, (_, i) => ({ params: { page: String(i + 2) } }));
+}
+const page = Number(Astro.params.page);
+---
+
+<NewsListPage lang="sl" page={page} />

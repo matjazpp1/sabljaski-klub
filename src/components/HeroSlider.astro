@@ -1,0 +1,272 @@
+---
+import { Image } from 'astro:assets';
+import { getEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { stockImage } from '../lib/stock';
+import { path, useTranslations, type Lang, type RouteKey } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const { hero } = (await getEntry('nastavitve', 'nastavitve'))!.data;
+const en = lang === 'en';
+
+const buttonTarget: Record<string, RouteKey> = {
+  zacni: 'start',
+  urnik: 'schedule',
+  kontakt: 'contact',
+  cenik: 'prices',
+  trenerji: 'coaches',
+};
+---
+
+<section class="hero" aria-roledescription="carousel" aria-label={t('site.name')} data-hero>
+  {
+    hero.map((s, i) => (
+      <div
+        class:list={['slide', { 'is-active': i === 0 }]}
+        role="group"
+        aria-roledescription="slide"
+        aria-label={`${i + 1} / ${hero.length}`}
+        aria-hidden={i === 0 ? undefined : 'true'}
+        data-slide
+      >
+        <Image
+          src={stockImage(s.slika)}
+          alt={en ? s.alt_en : s.alt}
+          widths={[640, 960, 1280, 1920, 2400]}
+          sizes="100vw"
+          class="slide__img"
+          loading={i === 0 ? 'eager' : 'lazy'}
+          fetchpriority={i === 0 ? 'high' : 'auto'}
+        />
+        <div class="container slide__content">
+          <div class="slide__box">
+            {i === 0 ? <h1>{en ? s.naslov_en : s.naslov}</h1> : <h2 class="h1">{en ? s.naslov_en : s.naslov}</h2>}
+            <p>{en ? s.podnaslov_en : s.podnaslov}</p>
+            <a class="btn" href={path(lang, buttonTarget[s.gumb])} tabindex={i === 0 ? undefined : -1}>
+              {t(`hero.btn.${s.gumb}` as any)} <Icon name="arrow" size={18} />
+            </a>
+          </div>
+        </div>
+      </div>
+    ))
+  }
+
+  {
+    hero.length > 1 && (
+      <div class="container hero__controls">
+        <button type="button" class="hero__arrow" data-prev>
+          <Icon name="arrow-left" />
+          <span class="visually-hidden">{t('hero.prev')}</span>
+        </button>
+        <div class="hero__dots">
+          {hero.map((_, i) => (
+            <button type="button" class="hero__dot" aria-current={i === 0 ? 'true' : undefined} data-dot={i}>
+              <span class="visually-hidden">
+                {t('hero.goto')} {i + 1}
+              </span>
+            </button>
+          ))}
+        </div>
+        <button type="button" class="hero__arrow" data-next>
+          <Icon name="arrow" />
+          <span class="visually-hidden">{t('hero.next')}</span>
+        </button>
+      </div>
+    )
+  }
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: min(88vh, 860px);
+    min-height: min(88svh, 860px);
+    display: grid;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .slide {
+    grid-area: 1 / 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.9s ease,
+      visibility 0.9s;
+  }
+  .slide.is-active {
+    opacity: 1;
+    visibility: visible;
+  }
+  .slide__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 35%;
+  }
+  /* temna prekrivna plast z rahlim zelenim tonom */
+  .slide::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(90deg, rgba(10, 14, 12, 0.88) 0%, rgba(10, 14, 12, 0.55) 55%, rgba(10, 14, 12, 0.35) 100%),
+      linear-gradient(0deg, rgba(30, 69, 53, 0.35), rgba(30, 69, 53, 0.35));
+  }
+  .slide__content {
+    position: relative;
+    z-index: 2;
+    padding-block: 6rem 10rem;
+  }
+  .slide__box {
+    max-width: 640px;
+    padding: clamp(1.75rem, 4vw, 3rem);
+    background: rgba(15, 18, 17, 0.72);
+    border-left: 4px solid var(--accent);
+  }
+  @supports (backdrop-filter: blur(4px)) {
+    .slide__box {
+      background: rgba(15, 18, 17, 0.6);
+      backdrop-filter: blur(4px);
+    }
+  }
+  .slide__box h1,
+  .slide__box .h1 {
+    color: var(--accent-light);
+    font-size: var(--fs-h1);
+  }
+  .slide__box p {
+    margin-bottom: 1.75rem;
+    font-size: 1.25rem;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .slide.is-active .slide__img {
+      animation: zoom 9s ease-out both;
+    }
+    @keyframes zoom {
+      from {
+        transform: scale(1.06);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+  }
+
+  .hero__controls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 6rem; /* nad karticami, ki prekrivajo spodnji rob */
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .hero__arrow {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(242, 244, 243, 0.4);
+    background: rgba(15, 18, 17, 0.5);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .hero__arrow:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .hero__dots {
+    display: flex;
+  }
+  .hero__dot {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    position: relative;
+  }
+  .hero__dot::after {
+    content: '';
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    top: 50%;
+    height: 3px;
+    background: rgba(242, 244, 243, 0.45);
+    transition: background 0.2s;
+  }
+  .hero__dot[aria-current='true']::after {
+    background: var(--accent-light);
+  }
+
+  @media (max-width: 960px) {
+    .hero__controls {
+      bottom: 1.5rem;
+    }
+  }
+  @media (max-width: 700px) {
+    .slide::before {
+      background: rgba(10, 14, 12, 0.6);
+    }
+    .slide__content {
+      align-self: end;
+      padding-block: 6rem 6rem;
+    }
+    .slide__box p {
+      font-size: 1.1rem;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-hero]');
+  if (root) {
+    const slides = [...root.querySelectorAll<HTMLElement>('[data-slide]')];
+    const dots = [...root.querySelectorAll<HTMLButtonElement>('[data-dot]')];
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let index = 0;
+    let timer: number | undefined;
+
+    const show = (next: number) => {
+      index = (next + slides.length) % slides.length;
+      slides.forEach((s, i) => {
+        const active = i === index;
+        s.classList.toggle('is-active', active);
+        if (active) s.removeAttribute('aria-hidden');
+        else s.setAttribute('aria-hidden', 'true');
+        s.querySelectorAll('a').forEach((a) => (active ? a.removeAttribute('tabindex') : a.setAttribute('tabindex', '-1')));
+      });
+      dots.forEach((d, i) => (i === index ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current')));
+    };
+
+    const stop = () => window.clearInterval(timer);
+    const start = () => {
+      if (reduced || slides.length < 2) return;
+      stop();
+      timer = window.setInterval(() => show(index + 1), 7000);
+    };
+
+    root.querySelector('[data-prev]')?.addEventListener('click', () => (show(index - 1), start()));
+    root.querySelector('[data-next]')?.addEventListener('click', () => (show(index + 1), start()));
+    dots.forEach((d) => d.addEventListener('click', () => (show(Number(d.dataset.dot)), start())));
+    root.addEventListener('mouseenter', stop);
+    root.addEventListener('mouseleave', start);
+    root.addEventListener('focusin', stop);
+    root.addEventListener('focusout', start);
+    // ostale slike naloži, ko je stran že prikazana
+    addEventListener('load', () => slides.forEach((s) => s.querySelector('img')?.setAttribute('loading', 'eager')));
+    start();
+  }
+</script>

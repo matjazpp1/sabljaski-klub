@@ -1,0 +1,20 @@
+---
+import ContentPage from './ContentPage.astro';
+import ClubDataCard from './ClubDataCard.astro';
+import { path, useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<ContentPage lang={lang} id="klub" crumbs={[{ label: t('nav.club') }]} image="hero-2.jpg">
+  <div slot="aside">
+    <ClubDataCard lang={lang} />
+    <p style="margin-top:1.5rem">
+      <a class="btn" href={path(lang, 'coaches')} style="width:100%">{t('home.coaches.btn')}</a>
+    </p>
+  </div>
+</ContentPage>

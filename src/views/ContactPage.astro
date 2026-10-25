@@ -1,0 +1,127 @@
+---
+import { getEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Icon from '../components/Icon.astro';
+import ClubDataCard from './ClubDataCard.astro';
+import { useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const k = (await getEntry('kontakt', 'kontakt'))!.data;
+const tel = `+386${k.telefon.replace(/\s/g, '').replace(/^0/, '')}`;
+const d = 0.004;
+const bbox = [k.lon - d * 1.6, k.lat - d, k.lon + d * 1.6, k.lat + d].join('%2C');
+const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${k.lat}%2C${k.lon}`;
+---
+
+<BaseLayout lang={lang} title={t('nav.contact')} description={t('contact.lead')}>
+  <PageHeader lang={lang} title={t('nav.contact')} lead={t('contact.lead')} image="hero-3.jpg" />
+  <div class="container section">
+    <div class="page-grid">
+      <div>
+        <div class="contact-cards">
+          <a class="contact-card" href={`tel:${tel}`}>
+            <Icon name="phone" size={28} />
+            <span class="contact-card__label">{t('phone')} · {k.kontaktna_oseba}</span>
+            <strong>{k.telefon}</strong>
+          </a>
+          <a class="contact-card" href={`mailto:${k.email}`}>
+            <Icon name="mail" size={28} />
+            <span class="contact-card__label">{t('email')}</span>
+            <strong>{k.email}</strong>
+          </a>
+          <a class="contact-card" href={k.zemljevid} target="_blank" rel="noopener">
+            <Icon name="pin" size={28} />
+            <span class="contact-card__label">{t('contact.where')}</span>
+            <strong>{lang === 'en' ? k.dvorana_en : k.dvorana}, {k.naslov}, {k.posta}</strong>
+            <span class="visually-hidden">{t('nav.newTab')}</span>
+          </a>
+        </div>
+
+        <div class="map">
+          <iframe
+            title={t('contact.mapTitle')}
+            src={mapSrc}
+            loading="lazy"
+            referrerpolicy="no-referrer"></iframe>
+        </div>
+        <p><a href={k.zemljevid} target="_blank" rel="noopener">{t('venue.map')} →</a></p>
+
+        <h2 class="social-title">{t('contact.social')}</h2>
+        <p class="socials">
+          <a class="btn btn--ghost" href={k.instagram} target="_blank" rel="noopener">
+            <Icon name="instagram" /> Instagram <span class="visually-hidden">{t('nav.newTab')}</span>
+          </a>
+          <a class="btn btn--ghost" href={k.facebook} target="_blank" rel="noopener">
+            <Icon name="facebook" /> Facebook <span class="visually-hidden">{t('nav.newTab')}</span>
+          </a>
+        </p>
+      </div>
+      <aside>
+        <ClubDataCard lang={lang} />
+      </aside>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .contact-cards {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .contact-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 1.25rem;
+    align-items: center;
+    padding: 1.5rem;
+    background: var(--surface);
+    border-left: 3px solid var(--accent);
+    color: var(--text);
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+  .contact-card:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .contact-card :global(svg) {
+    grid-row: span 2;
+    color: var(--accent-light);
+  }
+  .contact-card__label {
+    color: var(--muted);
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .contact-card strong {
+    font-size: 1.2rem;
+    overflow-wrap: anywhere;
+  }
+  .map {
+    aspect-ratio: 16 / 9;
+    margin-bottom: 0.75rem;
+    background: var(--surface);
+  }
+  .map iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    filter: grayscale(0.3);
+  }
+  .social-title {
+    margin-top: 2.5rem;
+    font-size: 1.4rem;
+  }
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+</style>

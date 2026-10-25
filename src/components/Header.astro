@@ -1,0 +1,412 @@
+---
+import { getEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import LanguageSwitch from './LanguageSwitch.astro';
+import { path, useTranslations, type Lang, type RouteKey } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const kontakt = (await getEntry('kontakt', 'kontakt'))!.data;
+const nastavitve = (await getEntry('nastavitve', 'nastavitve'))!.data;
+const current = Astro.url.pathname;
+
+type Item = { key: RouteKey; label: string };
+type MenuEntry = Item | { label: string; children: Item[] } | { label: string; href: string; external: true };
+
+const menu: MenuEntry[] = [
+  {
+    label: t('nav.club'),
+    children: [
+      { key: 'about', label: t('nav.about') },
+      { key: 'coaches', label: t('nav.coaches') },
+      { key: 'venue', label: t('nav.venue') },
+    ],
+  },
+  {
+    label: t('nav.training'),
+    children: [
+      { key: 'schedule', label: t('nav.schedule') },
+      { key: 'prices', label: t('nav.prices') },
+      { key: 'equipment', label: t('nav.equipment') },
+      { key: 'start', label: t('nav.start') },
+    ],
+  },
+  { key: 'news', label: t('nav.news') },
+  { key: 'fencing', label: t('nav.fencing') },
+  { key: 'archive', label: t('nav.archive') },
+  { key: 'contact', label: t('nav.contact') },
+  { label: t('nav.birthdays'), href: nastavitve.rojstni_dnevi, external: true },
+];
+
+const isActive = (key: RouteKey) => current.startsWith(path(lang, key));
+---
+
+<header class="site-header" data-header>
+  <div class="site-header__inner">
+    <a class="brand" href={path(lang, 'home')} aria-label={`${t('site.name')} – ${t('nav.home')}`}>
+      <img src="/logo/zelva-svetla.png" alt="" width="540" height="141" />
+    </a>
+
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" data-menu-toggle>
+      <Icon name="menu" size={26} class="icon-open" />
+      <Icon name="close" size={26} class="icon-close" />
+      <span class="visually-hidden">{t('nav.menu')}</span>
+    </button>
+
+    <nav id="main-nav" class="main-nav" aria-label={t('nav.main')} data-nav>
+      <ul class="main-nav__list">
+        <li class="main-nav__home">
+          <a href={path(lang, 'home')} aria-current={current === path(lang, 'home') ? 'page' : undefined}
+            >{t('nav.home')}</a
+          >
+        </li>
+        {
+          menu.map((entry, i) =>
+            'children' in entry ? (
+              <li class="has-sub" data-sub>
+                <button
+                  type="button"
+                  class:list={['sub-toggle', { active: entry.children.some((c) => isActive(c.key)) }]}
+                  aria-expanded="false"
+                  aria-controls={`sub-${i}`}
+                >
+                  {entry.label}
+                  <Icon name="chevron" size={16} />
+                </button>
+                <ul id={`sub-${i}`} class="sub-menu">
+                  {entry.children.map((c) => (
+                    <li>
+                      <a href={path(lang, c.key)} aria-current={isActive(c.key) ? 'page' : undefined}>
+                        {c.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ) : 'external' in entry ? (
+              <li>
+                <a href={entry.href} target="_blank" rel="noopener">
+                  {entry.label}
+                  <Icon name="external" size={14} />
+                  <span class="visually-hidden">{t('nav.newTab')}</span>
+                </a>
+              </li>
+            ) : (
+              <li>
+                <a href={path(lang, entry.key)} aria-current={isActive(entry.key) ? 'page' : undefined}>
+                  {entry.label}
+                </a>
+              </li>
+            ),
+          )
+        }
+      </ul>
+
+      <div class="main-nav__tools">
+        <a class="social" href={kontakt.instagram} target="_blank" rel="noopener">
+          <Icon name="instagram" />
+          <span class="visually-hidden">{t('social.instagram')} {t('nav.newTab')}</span>
+        </a>
+        <a class="social" href={kontakt.facebook} target="_blank" rel="noopener">
+          <Icon name="facebook" />
+          <span class="visually-hidden">{t('social.facebook')} {t('nav.newTab')}</span>
+        </a>
+        <LanguageSwitch lang={lang} />
+        <a class="btn btn--join" href={path(lang, 'start')}>{t('nav.join')}</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--line);
+  }
+  /* ozadje v psevdoelementu: backdrop-filter na sami glavi bi omejil fiksni mobilni meni na višino glave */
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgba(15, 18, 17, 0.97);
+  }
+  @supports (backdrop-filter: blur(8px)) {
+    .site-header::before {
+      background: rgba(15, 18, 17, 0.88);
+      backdrop-filter: blur(10px);
+    }
+  }
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    max-width: 1440px;
+    height: var(--header-h);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+  .brand {
+    flex-shrink: 0;
+    display: block;
+  }
+  .brand img {
+    width: auto;
+    height: 58px;
+  }
+
+  .main-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: auto;
+  }
+  .main-nav__list {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .main-nav__list > li {
+    position: relative;
+  }
+  .main-nav__list > li > a,
+  .sub-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.6rem 0.5rem;
+    border: 0;
+    background: none;
+    color: var(--text);
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .main-nav__list > li > a:hover,
+  .sub-toggle:hover,
+  .main-nav__list a[aria-current='page'],
+  .sub-toggle.active {
+    color: var(--accent-light);
+  }
+  .main-nav__home {
+    display: none;
+  }
+  .sub-toggle :global(svg) {
+    transition: transform 0.2s;
+  }
+  .sub-toggle[aria-expanded='true'] :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  .sub-menu {
+    margin: 0;
+    padding: 0.5rem 0;
+    list-style: none;
+  }
+  .sub-menu a {
+    display: block;
+    padding: 0.55rem 1.25rem;
+    color: var(--text);
+    font-size: 1rem;
+    text-decoration: none;
+  }
+  .sub-menu a:hover,
+  .sub-menu a[aria-current='page'] {
+    color: var(--accent-light);
+    background: var(--surface-2);
+  }
+
+  .main-nav__tools {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .social {
+    display: inline-grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    color: var(--text);
+  }
+  .social:hover {
+    color: var(--accent-light);
+  }
+  .btn--join {
+    margin-left: 0.5rem;
+    white-space: nowrap;
+    min-height: 44px;
+    padding: 0.65rem 1.2rem;
+  }
+
+  .menu-toggle {
+    display: none;
+    margin-left: auto;
+    width: 48px;
+    height: 48px;
+    place-items: center;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .menu-toggle :global(.icon-close),
+  .menu-toggle[aria-expanded='true'] :global(.icon-open) {
+    display: none;
+  }
+  .menu-toggle[aria-expanded='true'] :global(.icon-close) {
+    display: block;
+  }
+
+  /* Namizni prikaz: spustni meniji */
+  @media (min-width: 1280px) {
+    .sub-menu {
+      position: absolute;
+      top: calc(100% + 0.6rem);
+      left: 0;
+      min-width: 240px;
+      background: var(--surface);
+      border-top: 3px solid var(--accent);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(6px);
+      transition:
+        opacity 0.18s,
+        transform 0.18s,
+        visibility 0.18s;
+    }
+    /* most za miško med gumbom in menijem */
+    .has-sub::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      height: 0.8rem;
+    }
+    .has-sub:hover .sub-menu,
+    .sub-toggle[aria-expanded='true'] + .sub-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+    }
+  }
+
+  /* Mobilni in tablični prikaz: hamburger meni */
+  @media (max-width: 1279.98px) {
+    :root {
+      --header-h: 72px;
+    }
+    .brand img {
+      height: 48px;
+    }
+    .menu-toggle {
+      display: grid;
+    }
+    .main-nav {
+      position: fixed;
+      inset: var(--header-h) 0 0 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1.5rem;
+      margin: 0;
+      padding: 1.5rem var(--gutter) 2.5rem;
+      background: var(--bg);
+      overflow-y: auto;
+      display: none;
+    }
+    .main-nav.is-open {
+      display: flex;
+    }
+    .main-nav__list {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .main-nav__home {
+      display: block;
+    }
+    .main-nav__list > li {
+      border-bottom: 1px solid var(--line);
+    }
+    .main-nav__list > li > a,
+    .sub-toggle {
+      width: 100%;
+      justify-content: space-between;
+      padding: 0.95rem 0;
+      font-size: 1.1rem;
+    }
+    .sub-menu {
+      display: none;
+      padding: 0 0 0.75rem;
+    }
+    .sub-toggle[aria-expanded='true'] + .sub-menu {
+      display: block;
+    }
+    .sub-menu a {
+      padding: 0.6rem 1rem;
+      color: var(--muted);
+    }
+    .main-nav__tools {
+      flex-wrap: wrap;
+    }
+    .btn--join {
+      flex-basis: 100%;
+      margin: 0.75rem 0 0;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]')!;
+  const toggle = header.querySelector<HTMLButtonElement>('[data-menu-toggle]')!;
+  const nav = header.querySelector<HTMLElement>('[data-nav]')!;
+  const subToggles = header.querySelectorAll<HTMLButtonElement>('.sub-toggle');
+
+  const closeSubs = (except?: HTMLButtonElement) =>
+    subToggles.forEach((b) => b !== except && b.setAttribute('aria-expanded', 'false'));
+
+  const setMenu = (open: boolean) => {
+    toggle.setAttribute('aria-expanded', String(open));
+    nav.classList.toggle('is-open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  };
+
+  toggle.addEventListener('click', () => setMenu(toggle.getAttribute('aria-expanded') !== 'true'));
+
+  subToggles.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const open = btn.getAttribute('aria-expanded') !== 'true';
+      closeSubs(btn);
+      btn.setAttribute('aria-expanded', String(open));
+    }),
+  );
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    closeSubs();
+    if (nav.classList.contains('is-open')) {
+      setMenu(false);
+      toggle.focus();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!header.contains(e.target as Node)) closeSubs();
+  });
+
+  // ob prehodu na namizno širino zapri mobilni meni
+  matchMedia('(min-width: 1280px)').addEventListener('change', () => setMenu(false));
+</script>

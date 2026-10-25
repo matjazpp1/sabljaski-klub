@@ -1,0 +1,30 @@
+# Novice, objavljene pred tem datumom, so prikazane v Arhivu.
+novice_od: 2022-01-01
+novic_na_stran: 9
+rojstni_dnevi: https://www.kineziologinakvadrat.com/scaronportni-rojstni-dnevi.html
+# Slajdi na naslovnici. "slika" je ime datoteke v src/assets/stock/.
+hero:
+  - slika: hero-1.jpg
+    alt: Mečevalec v skoku napade nasprotnika na pisti
+    alt_en: An épée fencer leaps forward to attack an opponent on the piste
+    naslov: Začni s sabljanjem
+    naslov_en: Start fencing
+    podnaslov: Za otroke in odrasle, brez predznanja. Opremo posodimo, nove člane vpisujemo vse leto.
+    podnaslov_en: For children and adults, no experience needed. We lend the equipment, and new members can join all year round.
+    gumb: zacni
+  - slika: hero-2.jpg
+    alt: Dva mečevalca v napadu z mečem na tekmovanju
+    alt_en: Two épée fencers attacking during a competition
+    naslov: Tekmovalni program
+    naslov_en: Competitive programme
+    podnaslov: Od prvih turnirjev do evropskih prvenstev – pod vodstvom licenciranih trenerjev.
+    podnaslov_en: From first tournaments to European championships – guided by licensed coaches.
+    gumb: urnik
+  - slika: hero-3.jpg
+    alt: Mečevalca v borbi, rezilo meča se upogiba ob zadetku
+    alt_en: Two épée fencers in a bout, the blade bending on a hit
+    naslov: Rekreacija za odrasle
+    naslov_en: Recreational fencing for adults
+    podnaslov: Vadba za telo in glavo – brez predznanja, v sproščeni skupini.
+    podnaslov_en: A workout for body and mind – no experience needed, in a relaxed group.
+    gumb: kontakt

@@ -1,0 +1,118 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { getOrdered } from '../lib/data';
+import { useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const en = lang === 'en';
+const coaches = await getOrdered('trenerji');
+const initials = (name: string) =>
+  name
+    .split(' ')
+    .map((p) => p[0])
+    .join('');
+---
+
+<BaseLayout lang={lang} title={t('nav.coaches')} description={t('coaches.lead')}>
+  <PageHeader lang={lang} title={t('nav.coaches')} crumbs={[{ label: t('nav.club') }]} lead={t('coaches.lead')} />
+  <div class="container section">
+    <ul class="coaches">
+      {
+        coaches.map(({ data }) => (
+          <li class="coach reveal">
+            <div class="coach__photo">
+              {data.foto ? (
+                <Image src={data.foto} alt={data.ime} widths={[360, 540]} sizes="(max-width: 800px) 100vw, 360px" />
+              ) : (
+                <div class="coach__initials" role="img" aria-label={`${data.ime} – ${t('coaches.photoSoon')}`}>
+                  <span aria-hidden="true">{initials(data.ime)}</span>
+                </div>
+              )}
+            </div>
+            <div class="coach__body">
+              <h2>{data.ime}</h2>
+              <p class="coach__role">{(en && data.vloga_en) || data.vloga}</p>
+              <ul>
+                {data.reference.map((r) => (
+                  <li>{(en && r.en) || r.sl}</li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .coaches {
+    display: grid;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .coach {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    background: var(--surface);
+  }
+  .coach__photo {
+    aspect-ratio: 4 / 5;
+    background: var(--accent-dark);
+  }
+  .coach__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .coach__initials {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    background:
+      repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.035) 0 2px, transparent 2px 14px),
+      linear-gradient(160deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color: rgba(242, 244, 243, 0.92);
+    font-size: 5rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .coach__body {
+    padding: clamp(1.75rem, 4vw, 3rem);
+  }
+  .coach__body h2 {
+    margin-bottom: 0.25rem;
+  }
+  .coach__role {
+    color: var(--accent-light);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .coach__body ul {
+    margin: 0;
+    padding-left: 1.2em;
+  }
+  .coach__body li {
+    margin-bottom: 0.5rem;
+  }
+  .coach__body li::marker {
+    color: var(--accent-light);
+  }
+  @media (max-width: 800px) {
+    .coach {
+      grid-template-columns: 1fr;
+    }
+    .coach__photo {
+      aspect-ratio: 16 / 10;
+    }
+  }
+</style>
